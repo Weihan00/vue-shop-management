@@ -1,39 +1,40 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login'
-import Home from '../views/Home'
-import Test1 from '../views/Test1'
-import Test2 from '../views/Test2'
+import Login from '../components/Login'
+import Home from '../components/Home'
+
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Login',
-    component: Login,
-    hidden: true
+    redirect: 'login'
+  },
+  {
+    path: '/login',
+    component: Login
   },
   {
     path: '/home',
-    name: '导航一',
-    component: Home,
-    children: [
-      {
-        path: '/test1',
-        name: '选项1',
-        component: Test1
-      },
-      {
-        path: '/test2',
-        name: '选项2',
-        component: Test2
-      }
-    ]
+    component: Home
   }
+
 ]
 
 const router = new VueRouter({
   routes
+})
+
+// 挂载路由导航守卫, next函数表示放行 next('/login') 强制放行
+router.beforeEach((to, from, next) => {
+  if (to.path == '/login'){
+    return next();
+  }
+  else {
+    const tokenStr = window.sessionStorage.getItem('token')
+    if(!tokenStr) return next('/login')
+    next()
+  }
 })
 
 export default router
